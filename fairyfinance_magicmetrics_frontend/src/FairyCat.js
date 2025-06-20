@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * FairyCat - Shows a cat image with a custom fairy message via the Cataas API.
@@ -9,14 +9,27 @@ import React, { useState } from 'react';
 function FairyCat({ message = "Fairy Blessings" }) {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const fairyFont = "'Comic Sans MS', 'Brush Script MT', 'Caveat', 'Pacifico', cursive, sans-serif";
   const pastelBg = "linear-gradient(120deg, #f3e6ff, #ffe4fa 75%)";
   const catUrl = `https://cataas.com/cat/says/${encodeURIComponent(message)}?width=350&fontColor=8a2be2&fontSize=32&type=png`;
 
-  // Retry image on click fallback
-  const [retryKey, setRetryKey] = useState(0);
+  // Ref for <img>, prevents onLoad/onError firing after unmount
+  const isMounted = useRef(true);
 
-  // Spinner: sparkly pastel border and sparkles
+  // After mount, track if component is unmounted to avoid state update warning
+  useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; }
+  }, []);
+
+  // Reset loading when props.message OR retryKey changes (new cat should always be "loading...")
+  useEffect(() => {
+    setLoading(true);
+    setFailed(false);
+  }, [message, retryKey]);
+
+  // Spinner with fairy styling
   const spinner = (
     <div
       style={{
@@ -56,7 +69,7 @@ function FairyCat({ message = "Fairy Blessings" }) {
     </div>
   );
 
-  // Fallback: Fairy cat missed the portal
+  // Fallback for error
   const fallback = (
     <div
       style={{
@@ -67,13 +80,16 @@ function FairyCat({ message = "Fairy Blessings" }) {
         padding: "19px 16px 12px 16px"
       }}
     >
-      <div style={{fontSize: 55, marginBottom: 7}}>🐾</div>
-      <div style={{fontFamily: fairyFont, color:"#ff69b4", fontSize:"1.28rem", textAlign: "center", fontWeight: 500}}>
-        Oh whiskers! The fairy cat hid behind the moon.<br/>
-        <span style={{fontSize:"1.1rem", color:"#b373eb"}}>Try again for another sprinkle of magic!</span>
+      <div style={{ fontSize: 55, marginBottom: 7 }}>🐾</div>
+      <div style={{ fontFamily: fairyFont, color: "#ff69b4", fontSize: "1.28rem", textAlign: "center", fontWeight: 500 }}>
+        Oh whiskers! The fairy cat hid behind the moon.<br />
+        <span style={{ fontSize: "1.1rem", color: "#b373eb" }}>Try again for another sprinkle of magic!</span>
       </div>
       <button
-        onClick={() => { setRetryKey(k => k + 1); setFailed(false); setLoading(true); }}
+        onClick={() => {
+          // Reset state to reattempt load
+          setRetryKey((k) => k + 1);
+        }}
         className="btn"
         style={{
           fontFamily: fairyFont, marginTop: 17,
@@ -83,6 +99,21 @@ function FairyCat({ message = "Fairy Blessings" }) {
       >✨ Retry Fairy Cat</button>
     </div>
   );
+
+  // Image event handlers always clear spinner/loading states robustly
+  function handleLoad() {
+    // Only set state if component is still mounted
+    if (isMounted.current) {
+      setLoading(false);
+      setFailed(false);
+    }
+  }
+  function handleError() {
+    if (isMounted.current) {
+      setLoading(false);
+      setFailed(true);
+    }
+  }
 
   return (
     <div
@@ -111,11 +142,12 @@ function FairyCat({ message = "Fairy Blessings" }) {
       }}>
         🐱 Fairy Cat of the Day
       </div>
-      {/* Main CAT image or states */}
+      {/* Robust state logic ensures spinner only shows while loading */}
       {loading && !failed && spinner}
+      {/* Key on [message, retryKey] so React reloads the image whenever props or retry changes */}
       {!loading && !failed && (
         <img
-          key={retryKey}
+          key={message + retryKey}
           src={catUrl + `&cacheBust=${retryKey}`}
           alt={message}
           style={{
@@ -127,8 +159,9 @@ function FairyCat({ message = "Fairy Blessings" }) {
             margin: '0 auto',
             display: "block",
           }}
-          onLoad={() => setLoading(false)}
-          onError={() => { setLoading(false); setFailed(true); }}
+          onLoad={handleLoad}
+          onError={handleError}
+          loading="lazy"
         />
       )}
       {failed && fallback}
