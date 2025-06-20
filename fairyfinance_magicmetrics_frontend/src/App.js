@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 /**
@@ -157,6 +157,9 @@ function FairyFinanceMagicMetrics() {
             Enter your details below to let the Tooth Fairy work her magic, tracking your shiny teeth earnings and whimsical stories!
           </div>
         </header>
+
+        {/* Magical Message / Fairy Wisdom */}
+        <MagicMessage />
 
         {/* User Input Form */}
         {!showReport && (
@@ -636,5 +639,129 @@ function analyzeTrends(teethLost) {
   return msg;
 }
 
+
+/**
+ * Magical Message Component
+ * Fetches a random "fairy wisdom" quote and displays it with styled sparkle.
+ */
+// PUBLIC_INTERFACE
+function MagicMessage() {
+  const [quote, setQuote] = useState('');
+  const [author, setAuthor] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  // Whimsical style variables
+  const fairyFont = "'Comic Sans MS', 'Brush Script MT', 'Caveat', 'Pacifico', cursive, sans-serif";
+  const fairyGradient = "linear-gradient(90deg,#ffd70050,#ff69b460,#8a2be220 90%)";
+
+  // Fetch a magic message on mount
+  useEffect(() => {
+    setLoading(true); setFailed(false);
+    fetch('https://api.quotable.io/random')
+      .then(resp => {
+        if (!resp.ok) throw new Error("Bad quote response");
+        return resp.json();
+      })
+      .then(data => {
+        setQuote(data.content);
+        setAuthor(data.author);
+        setLoading(false);
+      })
+      .catch(() => {
+        setFailed(true);
+        setLoading(false);
+      });
+  }, []);
+
+  let content;
+  if (loading) {
+    content = (
+      <span style={{
+        color: "#b373eb",
+        fontFamily: fairyFont,
+        fontWeight: 500,
+        fontSize: "1.18rem"
+      }}>
+        🧚‍♀️ Summoning fairy wisdom...
+      </span>
+    );
+  } else if (failed) {
+    content = (
+      <span style={{
+        color: "#ff69b4",
+        fontFamily: fairyFont,
+        fontWeight: 500,
+        fontSize: "1.15rem"
+      }}>
+        ✨ The fairy folk are thinking... "Even the smallest tooth holds great magic!"
+      </span>
+    );
+  } else {
+    content = (
+      <span>
+        <span style={{
+          color: "#8a2be2",
+          fontFamily: fairyFont,
+          fontWeight: 600,
+          fontSize: "1.28rem"
+        }}>
+          <span style={{marginRight: 7}}>🧚 Magic Message:</span>
+          “{quote}”
+        </span>
+        <span style={{
+          color: "#b373eb",
+          fontFamily: fairyFont,
+          fontSize: "1.02rem",
+          marginLeft: 12
+        }}>
+          — {author}
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <div
+      aria-label="Magical message of the day"
+      style={{
+        margin: "20px auto 15px auto",
+        maxWidth: 620,
+        background: fairyGradient,
+        border: "2.5px dashed #ffd700",
+        borderRadius: 22,
+        textAlign: "center",
+        padding: "18px 22px 15px 22px",
+        fontFamily: fairyFont,
+        letterSpacing: .5,
+        boxShadow: "0 2px 24px #ffd70028, 0 2px 10px #ff69b420",
+        position: 'relative',
+        zIndex: 2
+      }}
+    >
+      <span
+        style={{
+          display: "inline-block",
+          marginRight: "9px",
+          verticalAlign: "middle",
+          fontSize: "1.55rem"
+        }}
+        role="img"
+        aria-label="sparkle"
+      >✨</span>
+      {content}
+      <span
+        style={{
+          display: "inline-block",
+          marginLeft: "9px",
+          verticalAlign: "middle",
+          fontSize: "1.55rem"
+        }}
+        role="img"
+        aria-label="sparkle"
+      >✨</span>
+    </div>
+  );
+}
 
 export default FairyFinanceMagicMetrics;
