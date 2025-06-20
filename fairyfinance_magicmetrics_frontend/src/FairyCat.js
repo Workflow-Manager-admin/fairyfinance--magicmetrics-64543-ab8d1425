@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 /**
  * FairyCat - Shows a cat image with a custom fairy message via the Cataas API.
- * Handles loading and errors, with fairy-tale styling.
+ * Handles loading and errors, with robust fairy-tale styling.
  */
 
 // PUBLIC_INTERFACE
@@ -23,7 +23,7 @@ function FairyCat({ message = "Fairy Blessings" }) {
     return () => { isMounted.current = false; }
   }, []);
 
-  // Reset loading when props.message OR retryKey changes (new cat should always be "loading...")
+  // Reset loading & error when props.message OR retryKey changes
   useEffect(() => {
     setLoading(true);
     setFailed(false);
@@ -87,7 +87,6 @@ function FairyCat({ message = "Fairy Blessings" }) {
       </div>
       <button
         onClick={() => {
-          // Reset state to reattempt load
           setRetryKey((k) => k + 1);
         }}
         className="btn"
@@ -100,12 +99,18 @@ function FairyCat({ message = "Fairy Blessings" }) {
     </div>
   );
 
-  // Image event handlers always clear spinner/loading states robustly
-  function handleLoad() {
-    // Only set state if component is still mounted
+  // Ensure state changes only if mounted (robust error/load handlers)
+  function handleLoad(e) {
     if (isMounted.current) {
-      setLoading(false);
-      setFailed(false);
+      // For certain network edge cases, browsers (esp. Chrome) can call onLoad even for an image that fails to draw,
+      // so check that the loaded image has substantial width (via e.target.naturalWidth)
+      if (e?.target?.naturalWidth > 10) {
+        setLoading(false);
+        setFailed(false);
+      } else {
+        setLoading(false);
+        setFailed(true);
+      }
     }
   }
   function handleError() {
@@ -142,9 +147,9 @@ function FairyCat({ message = "Fairy Blessings" }) {
       }}>
         🐱 Fairy Cat of the Day
       </div>
-      {/* Robust state logic ensures spinner only shows while loading */}
+      {/* Spinner is only visible while loading and did not fail */}
       {loading && !failed && spinner}
-      {/* Key on [message, retryKey] so React reloads the image whenever props or retry changes */}
+      {/* Image only displayed after load attempt */}
       {!loading && !failed && (
         <img
           key={message + retryKey}
@@ -162,8 +167,10 @@ function FairyCat({ message = "Fairy Blessings" }) {
           onLoad={handleLoad}
           onError={handleError}
           loading="lazy"
+          crossOrigin="anonymous"
         />
       )}
+      {/* If image load failed */}
       {failed && fallback}
     </div>
   );

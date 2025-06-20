@@ -196,9 +196,21 @@ function DiceBearAvatar({ seed = "Fairy123", style = {}, size = 96 }) {
             display: "block",
             objectFit: "cover",
           }}
-          onLoad={handleLoad}
+          onLoad={e => {
+            // For SVG (DiceBear sometimes returns empty blank), robustly check if loaded
+            if (isMounted.current) {
+              if (e?.target?.naturalWidth > 10) {
+                setLoading(false);
+                setFailed(false);
+              } else {
+                setLoading(false);
+                setFailed(true);
+              }
+            }
+          }}
           onError={handleError}
           loading="lazy"
+          crossOrigin="anonymous"
         />
       )}
       {failed && fallback}

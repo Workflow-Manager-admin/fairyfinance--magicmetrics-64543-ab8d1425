@@ -231,9 +231,20 @@ function QuickChartImage({ url = defaultQuickChartUrl, style = {}, alt = "Fairy 
             display: "block",
             objectFit: "contain",
           }}
-          onLoad={handleLoad}
+          onLoad={e => {
+            if (isMounted.current) {
+              if (e?.target?.naturalWidth > 10) {
+                setLoading(false);
+                setFailed(false);
+              } else {
+                setLoading(false);
+                setFailed(true);
+              }
+            }
+          }}
           onError={handleError}
           loading="lazy"
+          crossOrigin="anonymous"
         />
       )}
       {failed && fallback}
