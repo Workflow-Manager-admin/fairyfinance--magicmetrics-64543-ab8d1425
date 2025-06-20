@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import FairyCat from './FairyCat';
 
 /**
  * THEME COLORS
@@ -160,6 +161,9 @@ function FairyFinanceMagicMetrics() {
 
         {/* Magical Message / Fairy Wisdom */}
         <MagicMessage />
+
+        {/* Fairy Cat Visual Section */}
+        <FairyCat message="Fairy Blessings" />
 
         {/* User Input Form */}
         {!showReport && (
