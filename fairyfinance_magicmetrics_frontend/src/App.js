@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import FairyCat from './FairyCat';
-import DiceBearAvatar from './DiceBearAvatar';
-import QuickChartImage from './QuickChartImage';
 
 /**
  * THEME COLORS
@@ -160,29 +157,58 @@ function FairyFinanceMagicMetrics() {
             Enter your details below to let the Tooth Fairy work her magic, tracking your shiny teeth earnings and whimsical stories!
           </div>
 
-          {/* AVATAR and SAMPLE CHART - prominent and themed */}
+          {/* Prominent themed area - removed avatar, chart, and cat */}
           <div style={{
-            margin: "30px 0 10px 0", 
-            display: "flex", 
+            margin: "30px 0 10px 0",
+            display: "flex",
             flexWrap: "wrap",
-            alignItems:"flex-start",
+            alignItems:"center",
             justifyContent: "center",
-            gap: 36
+            gap: 24
           }}>
-            <DiceBearAvatar 
-              seed={name ? name : "Fairy123"} 
-              size={102} 
-              style={{minWidth:110, background: 'linear-gradient(111deg, #fffbe9 60%, #ffe4fa30)'}}
-            />
-            <QuickChartImage height={152} style={{minWidth:220}} />
+            <div style={{
+              minHeight:110,
+              minWidth:110,
+              background: 'linear-gradient(111deg, #fffbe9 60%, #ffe4fa30)',
+              borderRadius: 30,
+              border: '2px dashed #ffd700',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              fontSize:'2.5rem',
+              color:'#b373eb',
+              boxShadow: '0 2px 16px #ffd70035'
+            }}>
+              <span role="img" aria-label="tooth fairy">🧚‍♀️</span>
+            </div>
+            <div style={{
+              minHeight:110,
+              minWidth:190,
+              background: 'linear-gradient(111deg, #ffe4fa55 30%, #fff8dc70 100%)',
+              borderRadius: 30,
+              border: '2px dashed #ff69b4',
+              display:'flex',
+              flexDirection: 'column',
+              alignItems:'center',
+              justifyContent:'center',
+              fontWeight: 500,
+              fontSize:'1.1rem',
+              color:'#8a2be2',
+              boxShadow: '0 2px 16px #ff69b435'
+            }}>
+              <div style={{fontSize: '1.4rem', color:'#ff69b4', marginBottom: 5, fontWeight:600}}>
+                ✨ Welcome!
+              </div>
+              <div>
+                The FairyFinance app now focuses on magical math and stories.<br />
+                Enjoy your sparkly adventure! 🦷
+              </div>
+            </div>
           </div>
         </header>
 
         {/* Magical Message / Fairy Wisdom */}
         <MagicMessage />
-
-        {/* Fairy Cat Visual Section */}
-        <FairyCat message="Fairy Blessings" />
 
         {/* User Input Form */}
         {!showReport && (
@@ -504,7 +530,6 @@ function MagicalLedger({name, age, teethLost, totalEarnings, avgValue}) {
     </section>
   );
 }
-
 
 // PUBLIC_INTERFACE
 function LedgerTable({teethLost}) {
