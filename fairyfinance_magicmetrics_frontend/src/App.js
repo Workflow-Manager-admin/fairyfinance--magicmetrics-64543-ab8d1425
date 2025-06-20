@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import FairyCat from './FairyCat';
+import DiceBearAvatar from './DiceBearAvatar';
+import QuickChartImage from './QuickChartImage';
 
 /**
  * THEME COLORS
@@ -156,6 +158,23 @@ function FairyFinanceMagicMetrics() {
             fontWeight: 400, color:"#4c3363"
           }}>
             Enter your details below to let the Tooth Fairy work her magic, tracking your shiny teeth earnings and whimsical stories!
+          </div>
+
+          {/* AVATAR and SAMPLE CHART - prominent and themed */}
+          <div style={{
+            margin: "30px 0 10px 0", 
+            display: "flex", 
+            flexWrap: "wrap",
+            alignItems:"flex-start",
+            justifyContent: "center",
+            gap: 36
+          }}>
+            <DiceBearAvatar 
+              seed={name ? name : "Fairy123"} 
+              size={102} 
+              style={{minWidth:110, background: 'linear-gradient(111deg, #fffbe9 60%, #ffe4fa30)'}}
+            />
+            <QuickChartImage height={152} style={{minWidth:220}} />
           </div>
         </header>
 
